@@ -1,0 +1,43 @@
+#Simulate Data Warehouse, Data Lake, and Data Lakehouse
+
+import pandas as pd
+import os
+
+# Step 1: Upload CSV 
+print("Step 1: Upload a CSV file using the file upload option")
+
+# Step 2: Read dataset
+filename = "ecommerce_customer_behavior_dataset.csv"
+df = pd.read_csv(filename)
+
+print("\n Dataset successfully loaded!")
+print(f"Rows: {df.shape[0]}, Columns: {df.shape[1]}")
+print("First 5 rows of dataset:")
+print(df.head())
+
+import pandas as pd
+import os
+
+# Step 3: Create folders to simulate three systems
+os.makedirs("data_warehouse", exist_ok=True)
+os.makedirs("data_lake", exist_ok=True)
+os.makedirs("data_lakehouse", exist_ok=True)
+
+#Step 4: Save dataset in different formats
+#Data Warehouse simulation - structured data
+df.to_csv("data_warehouse/warehouse_data.csv", index = False)
+print("\n Data Warehouse: Saved as CSV")
+
+# Data Lake simulation - raw/unstructured format (JSON)
+df.to_json("data_lake/lake_data.json", orient="records", lines=True)
+print("Data Lake: Saved as JSON")
+
+#Data Lakehouse simulation - optimized, hybrid format (Parquet)
+df.to_parquet("data_lakehouse/lakehouse_data.parquet")
+print("Data Lakehouse: Saved as Parquet (hybrid structured + flexible)")
+
+# Step 5: Compare the saved files
+print("\n Comparing File Details:")
+print(f"Data Warehouse File Size: {os.path.getsize('data_warehouse/warehouse_data.csv')} bytes")
+print(f"Data Lake File Size: {os.path.getsize('data_lake/lake_data.json')} bytes")
+print(f"Data Lakehouse File Size: {os.path.getsize('data_lakehouse/lakehouse_data.parquet')} bytes")
