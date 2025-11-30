@@ -1,0 +1,52 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set(style="whitegrid", palette="muted")
+
+data = {
+    'Customer_ID' : ['C001', 'C002', 'C003', 'C004', 'C005', 'C006', 'C007', 'C008'],
+    'Age' : [25, 34, 28, 40, 31, 22, 45, 37],
+    'Gender' : ['F', 'M', 'F', 'M', 'F', 'M', 'M', 'M'],
+    'Income': [40000, 60000, 45000, 80000, 55000, 38000, 90000, 72000],
+    'Purchase_Amount': [250, 400, 350, 500, 300, 220, 580, 460],
+    'Loyalty_Level': ['Low', 'High', 'Medium', 'High', 'Medium', 'Low', 'High', 'Medium']
+}
+
+df = pd.DataFrame(data)
+print("=== Dataset ===")
+print(df)
+
+print("\n=== Basic Info ===")
+print(df.info())
+
+print("\n=== Statistical Summary ===")
+print(df.describe(include='all'))
+
+plt.figure(figsize=(8,5))
+plt.hist(df['Income'], bins=8, color='skyblue', edgecolor='black')
+plt.title('Income Distribution', fontsize=14)
+plt.xlabel('Income')
+plt.ylabel('Frequency')
+plt.show()
+
+plt.figure(figsize=(8,5))
+sns.boxplot(x='Loyalty_Level', y='Purchase_Amount', data=df, palette='Set2')
+plt.title('Boxplot of Purchase Amount by Loyalty Level', fontsize=14)
+plt.show()
+
+sns.pairplot(df, vars=['Age', 'Income', 'Purchase_Amount'], hue='Gender', palette='husl', diag_kind='kde')
+plt.suptitle('Pair Plot of Key Numerical Features', y=1.02)
+plt.show()
+
+df_encoded = df.copy()
+df_encoded['Gender'] = df_encoded['Gender'].map({'F': 0, 'M': 1})
+df_encoded['Loyalty_Level'] = df_encoded['Loyalty_Level'].map({'Low': 1, 'Medium': 2, 'High': 3})
+
+corr = df_encoded.corr(numeric_only=True)
+
+plt.figure(figsize=(7,5))
+sns.heatmap(corr, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Heatmap', fontsize=14)
+plt.show()
