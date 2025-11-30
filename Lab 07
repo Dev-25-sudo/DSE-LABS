@@ -41,3 +41,83 @@ print("\n Comparing File Details:")
 print(f"Data Warehouse File Size: {os.path.getsize('data_warehouse/warehouse_data.csv')} bytes")
 print(f"Data Lake File Size: {os.path.getsize('data_lake/lake_data.json')} bytes")
 print(f"Data Lakehouse File Size: {os.path.getsize('data_lakehouse/lakehouse_data.parquet')} bytes")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Simulate Data Warehouse, Data Lake, and Data Lakehouse
+
+import pandas as pd
+import os
+
+# Install xlrd for .xls file support if not already installed (not needed if it's a CSV)
+# !pip install xlrd
+
+# Step 1: Upload CSV (or in this case, a .xls file that appears to be CSV)
+print("Step 1: Ensure 'ecommerce_customer_behavior_dataset.xls' is present")
+
+# Step 2: Read dataset
+filename = "ecommerce_customer_behavior_dataset.xls"
+
+try:
+    # Try reading as CSV first, given the error message
+    df = pd.read_csv(filename)
+    print("\n Dataset successfully loaded as CSV!")
+except Exception as csv_e:
+    print(f"Could not read as CSV: {csv_e}")
+    print("Attempting to read as Excel (might be an .xlsx file with wrong extension or actual .xls):")
+    try:
+        # Specify engine='xlrd' for older .xls files (already tried and failed, but kept for context)
+        # Or, if it's a newer .xlsx file, pandas might infer or 'openpyxl' engine would be needed
+        df = pd.read_excel(filename, engine='xlrd') # This was the previous attempt
+        print("\n Dataset successfully loaded as XLS using xlrd engine!")
+    except Exception as excel_e:
+        print(f"Could not read as Excel with xlrd: {excel_e}")
+        print("If the file is a newer .xlsx format, try installing `openpyxl` and specify `engine='openpyxl'`.")
+        # Fallback for newer Excel formats if it's actually an Excel file incorrectly named
+        try:
+            !pip install openpyxl
+            df = pd.read_excel(filename, engine='openpyxl')
+            print("\n Dataset successfully loaded as XLSX using openpyxl engine!")
+        except Exception as openpyxl_e:
+            print(f"Could not read as XLSX with openpyxl: {openpyxl_e}")
+            print("Error: Failed to load dataset. Please ensure the file format is correct and try again.")
+            exit()
+
+print(f"Rows: {df.shape[0]}, Columns: {df.shape[1]}")
+print("First 5 rows of dataset:")
+print(df.head())
+
+# Step 3: Create folders to simulate three systems
+os.makedirs("data_warehouse", exist_ok=True)
+os.makedirs("data_lake", exist_ok=True)
+os.makedirs("data_lakehouse", exist_ok=True)
+
+#Step 4: Save dataset in different formats
+#Data Warehouse simulation - structured data
+df.to_csv("data_warehouse/warehouse_data.csv", index = False)
+print("\n Data Warehouse: Saved as CSV")
+
+# Data Lake simulation - raw/unstructured format (JSON)
+df.to_json("data_lake/lake_data.json", orient="records", lines=True)
+print("Data Lake: Saved as JSON")
+
+#Data Lakehouse simulation - optimized, hybrid format (Parquet)
+df.to_parquet("data_lakehouse/lakehouse_data.parquet")
+print("Data Lakehouse: Saved as Parquet (hybrid structured + flexible)")
+
+# Step 5: Compare the saved files
+print("\n Comparing File Details:")
+print(f"Data Warehouse File Size: {os.path.getsize('data_warehouse/warehouse_data.csv')} bytes")
+print(f"Data Lake File Size: {os.path.getsize('data_lake/lake_data.json')} bytes")
+print(f"Data Lakehouse File Size: {os.path.getsize('data_lakehouse/lakehouse_data.parquet')} bytes")
