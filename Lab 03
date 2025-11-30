@@ -1,71 +1,31 @@
+#Step 1: Import Libraries
 import pandas as pd
-import numpy as np
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder, StandardScaler, MinMaxScaler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-data = {
-    'Customer_ID' : ['C001', 'C002', 'C003', 'C004', 'C005', 'C006'],
-    'Age': [25, 34, 28, 40, np.nan, 31],
-    'Gender': ['F', 'M', 'F', 'M', 'F', 'M'],
-    'Income': [40000, 60000, np.nan, 80000, 45000, 70000],
-    'Purchase_Amount': [250, 400, 350, 500, 300, 450],
-    'Loyalty_Level': ['Low', 'High', 'Medium', 'High', 'Low', 'Medium']
-}
+#Step 2: Load Dataset
+iris = load_iris(as_frame=True)
+data = iris.frame  #Convert to DataFrame
 
-df = pd.DataFrame(data)
-print("=== Original Dataset ===")
-print(df)
+#Show first 5 rows of dataset
+print("First 5 rows of dataset:\n", data.head(), "\n")
 
-print("\n=== Data Info ===")
-print(df.info())
+#Shape tells us how many rows and columns are there
+print("Shape:", data.shape, "\n")
 
-print("\n=== Descriptive Statistics ===")
-print(df.describe(include='all'))
+#Check missing values
+print("Missing values:\n", data.isnull().sum(), "\n")
 
-print("\n=== Missing Values ===")
-print(df.isnull().sum())
-
-print("\n=== Correlation Matrix ===")
-print(df.corr(numeric_only=True))
-
-df['Age'].fillna(df['Age'].mean(), inplace=True)
-df['Income'].fillna(df['Income'].mean(), inplace=True)
-
-print("\n=== After Handling Missing Values ===")
-print(df)
-
-x = df[['Age', 'Income', 'Purchase_Amount']]
-y = df['Gender']
-
-X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=42)
-
-model = RandomForestClassifier(random_state=42)
-model.fit(X_train, y_train)
-
-importances = pd.Series(model.feature_importances_, index=x.columns)
-print("\n=== Feature Importance ===")
-print(importances.sort_values(ascending=False))
-
-le = LabelEncoder()
-df['Gender_Label'] = le.fit_transform(df['Gender'])
-
-order = {'Low': 1, 'Medium': 2, 'High': 3}
-df['Loyalty_Level_Encoded'] = df['Loyalty_Level'].map(order)
-
-df = pd.get_dummies(df, columns=['Gender'], drop_first=True)
-
-print("\n=== After Encoding ===")
-print(df)
-
-scaler = MinMaxScaler()
-scaled_cols = ['Age', 'Income', 'Purchase_Amount']
-
-df[scaled_cols] = scaler.fit_transform(df[scaled_cols])
-
-print("\n=== After Scaling (Min-Max) ===")
-print(df)
-
-print("\n=== Final Feature-Engineered Dataset ===")
-print(df)
-
+#Step 3: Feature Selection
+data = data[['sepal length (cm)', 'sepal width (cm)', 'target']]
+#Step 4: Feature Extraction
+data.loc[:, 'sepal_ratio'] = data['sepal length (cm)'] / data['sepal width (cm)']
+#Step 5: Encoding
+encoder = LabelEncoder()
+data.loc[:, 'target'] = encoder.fit_transform(data['target'])
+#Step 6: Scaling numerical features
+scaler = StandardScaler()
+data.loc[:, ['sepal length (cm)', 'sepal width (cm)', 'sepal_ratio']] = scaler.fit_transform(
+    data[['sepal length (cm)', 'sepal width (cm)', 'sepal_ratio']]
+#Step 7: Final Ouput
+print("Final Processed Data:\n", data.head())
