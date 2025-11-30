@@ -1,0 +1,47 @@
+import pandas as pd
+import requests
+import sqlite3
+
+url = "https://jsonplaceholder.typicode.com/users"
+response = requests.get(url)
+
+if response.status_code == 200:
+    data = response.json()
+    print("Data successfully extracted from API")
+else:
+    print("Failed to fetch data from API")
+
+df = pd.DataFrame(data)
+print("\n=== Raw Extracted Data ===")
+print(df.head())
+
+df = df[['id', 'name', 'username', 'email', 'address', 'phone', 'company']]
+
+df['city'] = df['address'].apply(lambda x: x['city'])
+df['street'] = df['address'].apply(lambda x: x['street'])
+df['zipcode'] = df['address'].apply(lambda x: x['zipcode'])
+df['company_name'] = df['company'].apply(lambda x: x['name'])
+
+df.drop(columns=['address', 'company'], inplace=True)
+
+df.columns = df.columns.str.lower().str.replace(' ', '_')
+
+df.fillna('Not Available', inplace=True)
+print("\n=== Transformed Data ===")
+print(df.head())
+
+output_csv = "transformed_users.csv"
+df.to_csv(output_csv, index=False)
+print(f"Data successfully loaded into CSV file: {output_csv}")
+
+conn = sqlite3.connect('etl_output.db')
+df.to_sql('users', conn, if_exists='replace', index=False)
+conn.close()
+print("Data successfully loaded into SQLite database: etl_output.db")
+
+conn = sqlite3.connect('etl_output.db')
+loaded_df = pd.read_sql("SELECT * FROM users", conn)
+conn.close()
+
+print("\n=== Data from SQLite (Verification) ===")
+print(loaded_df.head())
