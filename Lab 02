@@ -1,0 +1,89 @@
+import pandas as pd
+
+# Dataset 1: Contains missing values and unclean column names
+data1 = {
+    'ID' : [1, 2, 3, 4],
+    'Name' : ['Alice', 'Bob', None, 'David'],
+    'Age' : [25, None, 28, 22],
+    'City' : ['New York', 'London', 'Tokyo', None]
+}
+
+df1 = pd.DataFrame(data1)
+
+print(" Original Dataset 1:")
+print(df1)
+
+# Dataset 2: Another dataset for joining
+data2 = {
+    'ID' : [3, 4, 5, 6],
+    'Department' : ['HR', 'IT', 'Finance', 'Admin'],
+    'Salary' : [50000, 60000, 55000, 45000]
+}
+
+df2 = pd.DataFrame(data2)
+
+print("\n Original Dataset 2:")
+print(df2)
+
+# HANDLE MISSING VALUES
+
+print("\nHandling Missing Values:")
+
+# Fill missing values with default values
+df1['Name'] = df1['Name'].fillna('Unknown')
+df1['Age'] = df1['Age'].fillna(df1['Age'].mean()) # Replace with average age
+df1['City'] = df1['City'].fillna('Not Available')
+
+print("After filling missing values:")
+print(df1)
+
+# RENAME COLUMNS
+
+print("\nRenaming Columns:")
+
+df1 = df1.rename(columns={'Name ': 'Name', 'Age ': 'Age'})
+print("After renaming columns:")
+print(df1)
+
+# CHANGE DATA TYPES
+
+print("\nChanging Data Types:")
+
+# Fill NaN values in 'Age' with the mean before converting to integer
+df1['Age'] = df1['Age'].fillna(df1['Age'].mean())
+# Convert Age to integer (from float after mean)
+df1['Age'] = df1['Age'].astype(int)
+print("After changing data types:")
+print(df1.dtypes)
+print(df1)
+
+# REMOVE DUPLICATES
+
+print("\nRemoving Duplicates:")
+df1 = pd.concat([df1, df1.iloc[[2]]]) # Add duplicate row
+print("Before removing duplicates:")
+print(df1)
+
+df1 = df1.drop_duplicates()
+print("After removing duplicates:")
+print(df1)
+
+# JOIN DATASETS
+
+print("\nJoining Datasets:")
+
+merged_df = pd.merge(df1, df2, on='ID', how='inner')
+print("Merged Dataset:")
+print(merged_df)
+
+# VISUALIZATION (Line Graph Example)
+
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(8,5))
+plt.plot(merged_df['Name'], merged_df['Salary'], marker='o', color='teal')
+plt.title('Salary vs Employee Name')
+plt.xlabel('Employee Name')
+plt.ylabel('Salary')
+plt.grid(True)
+plt.show()
