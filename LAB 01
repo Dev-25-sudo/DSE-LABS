@@ -1,0 +1,62 @@
+
+import pandas as pd
+import requests
+
+csv_data = pd.read_csv('car_price_prediction_.csv')
+print("Structured Data (CSV):")
+print(csv_data.head())
+
+# Example: Fetching data from a public API
+response = requests.get("https://jsonplaceholder.typicode.com/users")
+json_data = response.json()
+
+print("\nSemi-Structured Data (JSON from API):")
+print(json_data[0])
+
+json_df = pd.json_normalize(json_data)
+print("\nSemi-Structured Data (JSON as DataFrame):")
+print(json_df.head())
+
+# Reading data from a .txt file
+with open('sample_txt.txt', 'r') as file:
+    text_data = file.read()
+
+# Basic text processing
+line_count = len(text_data.split('\n'))
+word_count = len(text_data.split())
+
+print("\nUnstructured Data (Text File):")
+print(f"Content:\n{text_data}")
+print(f"\nNumber of Lines: {line_count}")
+print(f"Number of Words: {word_count}")
+
+!pip install requests beautifulsoup4 pandas
+
+# Import Libraries
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# Step 1: Fetch the webpage
+url = "https://news.ycombinator.com/"
+response = requests.get(url)
+
+# Step 2: Parse the HTML
+soup = BeautifulSoup(response.text, "html.parser")
+
+# Step 3: Extract titles and links
+titles = []
+links = []
+
+for item in soup.select(".titleline > a"):
+    titles.append(item.get_text())
+    links.append(item["href"])
+
+# Step 4: Save results in a DataFrame
+df = pd.DataFrame({
+    "Title": titles,
+    "Link": links
+})
+
+# Step 5: Show the DataFrame
+df
